@@ -4,6 +4,9 @@
 .idea/
 *.ast
 *.ir
+*.png
+*.npy
+*.txt
 
 
 # Byte-compiled / optimized / DLL files
