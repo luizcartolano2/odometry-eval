@@ -16,7 +16,7 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from src.visualize import get_xy, get_seq_start
-from src.rpe_calc import translational_error
+from src.rpe_calc import translational_error, rotational_error
 
 
 def create_argparse():
@@ -132,11 +132,16 @@ if __name__ == '__main__':
     elif ate_opt is not None:
         raise NotImplementedError
     elif rpe_opt is not None:
+        # get translational attrs
         gt_tst = [v for v in gt_poses[:, 3:6]]
         pred_tst = [v for v in pred_poses[:, 3:]]
 
-        for gt, pred in zip(gt_tst, pred_tst):
-            pass
+        # get rotational attrs
+        gt_rot = [v for v in gt_poses[:, 0:3]]
+        pred_rot = [v for v in pred_poses[:, 0:3]]
+
+        for gt, pred in zip(gt_rot, pred_rot):
+            print(rotational_error(gt, pred))
 
     else:
         raise NotImplementedError
