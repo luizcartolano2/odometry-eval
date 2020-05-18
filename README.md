@@ -1,25 +1,22 @@
 # Github Template
 
-Github Template is a repository that aims to make easy to create new repos.
-
-The following sections are examples for a good README.md .
+This is an API that implements a system to evaluate odometry trajectories.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requirements.
 
 ```bash
-pip install foobar
+pip install -r requirements.txt
 ```
 
 ## Usage
 
-```python
-import foobar
-
-foobar.pluralize('word') # returns 'words'
-foobar.pluralize('goose') # returns 'geese'
-foobar.singularize('phenomena') # returns 'phenomenon'
+```bash
+python3 run.py gt_00.txt pred_00.txt -v
+python3 run.py gt_00.txt pred_00.txt -ate
+python3 run.py gt_00.txt pred_00.txt -rpe
+python3 run.py gt_00.txt pred_00.txt -v -ate -rpe
 ```
 
 ## Contributing
