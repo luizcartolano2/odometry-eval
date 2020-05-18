@@ -16,7 +16,7 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from src.visualize import get_xy, get_seq_start
-from src.rpe_calc import translational_error, rotational_error
+from src.rpe_calc import calculate_rpe_vector, get_statistics, calc_rpe_error
 
 
 def create_argparse():
@@ -140,8 +140,17 @@ if __name__ == '__main__':
         gt_rot = [v for v in gt_poses[:, 0:3]]
         pred_rot = [v for v in pred_poses[:, 0:3]]
 
-        for gt, pred in zip(gt_rot, pred_rot):
-            print(rotational_error(gt, pred))
+        # calculate rpe errors vector
+        rpe_vector = calculate_rpe_vector(gt_tst, gt_rot, pred_tst, pred_rot)
+        rpe_error = calc_rpe_error(rpe_vector)
 
+        # calculate errors statistics
+        statistics = get_statistics(rpe_error)
+
+        # write response to a .txt file
+        file_to_save = pathlib.Path(pred_file).stem
+        with open(f'{file_to_save}.txt', 'w') as f:
+            for k, v in statistics.items():
+                f.write(f'{k} >>> {v} \n\n')
     else:
         raise NotImplementedError

@@ -30,7 +30,6 @@
         plt.legend()
         plt.show()
 """
-import numpy as np
 
 
 def get_xy(pose):
