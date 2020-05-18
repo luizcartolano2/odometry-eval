@@ -1,13 +1,21 @@
 # -*- coding: UTF8 -*-
 """
     NAME
-        app
+        run
     DESCRIPTION
-        TODO: add
-    METHODS
-        TODO: add
+        Script to run the odometry evaluation.
     EXAMPLES
-        TODO: add
+        # to visualize
+        python3 run.py path_gt path_pred -v
+
+        # to rpe
+        python3 run.py path_gt path_pred -rpe
+
+        # to ate
+        python3 run.py path_gt path_pred -ate
+
+        # to all
+        python3 run.py path_gt path_pred -v -ate -rpe
 """
 import os
 import sys
