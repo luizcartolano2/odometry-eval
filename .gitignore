@@ -2,11 +2,6 @@
 .DS_Store
 **/.DS_Store
 .idea/
-*.ast
-*.ir
-*.png
-*.npy
-*.txt
 
 
 # Byte-compiled / optimized / DLL files
