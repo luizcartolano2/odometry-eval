@@ -1,0 +1,548 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Configuration of Project Environment &#8212; odometry-evaluation 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration-of-project-environment">
+<h1>Configuration of Project Environment<a class="headerlink" href="#configuration-of-project-environment" title="Permalink to this headline">¶</a></h1>
+<p>This is an API that implements a system to evaluate odometry trajectories.</p>
+<div class="section" id="overview-on-how-to-run-this-api">
+<h2>Overview on How to Run this API<a class="headerlink" href="#overview-on-how-to-run-this-api" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Either install a Python IDE or create a Python virtual environment to install the packages required</p></li>
+<li><p>Install packages required</p></li>
+</ol>
+</div>
+<div class="section" id="setup-procedure">
+<h2>Setup procedure<a class="headerlink" href="#setup-procedure" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><dl>
+<dt>Configure project environment (Either A. Install Pycharm OR B. Create a Virtual Environment)</dt><dd><ol class="upperalpha">
+<li><dl class="simple">
+<dt>Install Pycharm (www.jetbrains.com/pycharm/download/) or Sublime (<a class="reference external" href="https://www.sublimetext.com/3">https://www.sublimetext.com/3</a>)</dt><dd><ul class="simple">
+<li><p>configure pylinter</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Create a Python Virtual Environment</dt><dd><ul>
+<li><p>Install virtualenv:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">virtualenv</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create virtialenv:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">virtualenv</span> <span class="o">-</span><span class="n">p</span> <span class="n">python3</span> <span class="o">&lt;</span><span class="n">name</span> <span class="n">of</span> <span class="n">virtualenv</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Install requirements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Run app.py</p>
+<blockquote>
+<div><p>python run.py path_gt path_pred -v
+python run.py path_gt path_pred -ate
+python run.py path_gt path_pred -rpe
+python run.py path_gt path_pred -v -ate -rpe</p>
+</div></blockquote>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="documentation-for-the-code">
+<h1>Documentation for the Code<a class="headerlink" href="#documentation-for-the-code" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="module-src.visualize">
+<span id="visualize-functions"></span><h2>Visualize Functions<a class="headerlink" href="#module-src.visualize" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>NAME</dt><dd><p>visualize</p>
+</dd>
+<dt>DESCRIPTION</dt><dd><p>Module that implements methods to plot ground_truth trajectories
+and estimated for 6D poses.</p>
+</dd>
+<dt>METHODS</dt><dd><dl class="simple">
+<dt>get_xy(pose)</dt><dd><p>Function that extracts (x,y) positions from
+a list of 6D poses.</p>
+</dd>
+<dt>get_seq_start(pose)</dt><dd><p>Function that extracts the first (x,y)
+point from a list of 6D poses.</p>
+</dd>
+</dl>
+</dd>
+<dt>EXAMPLES</dt><dd><p>gt = np.load(‘04.npy’)
+# create plot obj
+plt.clf()
+# get gt_poses
+gt_x, gt_y = get_xy(gt)
+# get sequence start
+x_start, y_start = get_seq_start(gt)
+# plot gt
+plt.scatter(x_start, y_start, label=’Sequence Start’, color=’black’)
+plt.plot(gt_x, gt_y, color=’g’, label=’Ground Truth’)
+# make the adjust for compute just translation
+# instead of absolute position
+plt.gca().set_aspect(‘equal’, adjustable=’datalim’)
+# show plot
+plt.legend()
+plt.show()</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="src.visualize.get_seq_start">
+<code class="sig-prename descclassname">src.visualize.</code><code class="sig-name descname">get_seq_start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/visualize.html#get_seq_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.visualize.get_seq_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that extracts the first (x,y)
+point from a list of 6D poses.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>pose<span class="classifier">nd.array</span></dt><dd><p>List of 6D poses.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>x_start<span class="classifier">float</span></dt><dd><p>Start x point.</p>
+</dd>
+<dt>y_start<span class="classifier">float</span></dt><dd><p>Start y point</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.visualize.get_xy">
+<code class="sig-prename descclassname">src.visualize.</code><code class="sig-name descname">get_xy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/visualize.html#get_xy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.visualize.get_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that extracts (x,y) positions from
+a list of 6D poses.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>pose<span class="classifier">nd.array</span></dt><dd><p>List of 6D poses.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>x_pose<span class="classifier">list</span></dt><dd><p>List of x positions.</p>
+</dd>
+<dt>y_pose<span class="classifier">list</span></dt><dd><p>List of y positions.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.rpe_calc">
+<span id="rpe-functions"></span><h2>RPE Functions<a class="headerlink" href="#module-src.rpe_calc" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>NAME</dt><dd><p>rpe_calc</p>
+</dd>
+<dt>DESCRIPTION</dt><dd><p>Module that implements methods to calculate
+the relative pose error between two trajectories.</p>
+</dd>
+<dt>METHODS</dt><dd><dl class="simple">
+<dt>convert_pose_se3(pose_tst, pose_rot)</dt><dd><p>Convert a rotation matrix (or euler angles)
+plus a translation vector into a 4x4 pose
+representation.</p>
+</dd>
+<dt>relative_se3(pose_1, pose_2)</dt><dd><p>Relative pose between two poses (drift).</p>
+</dd>
+<dt>se3_inverse(pose)</dt><dd><p>The inverse of a pose.</p>
+</dd>
+<dt>calc_rpe_pair(Q_i, Q_i_delta, p_i, p_i_delta)</dt><dd><p>The relative error between GT and Predict.</p>
+</dd>
+<dt>so3_log(rot_matrix)</dt><dd><p>Gets the rotation matrix from pose.</p>
+</dd>
+<dt>calculate_rpe_vector(gt_tst, gt_rot, pred_tst, pred_rot)</dt><dd><p>Gets a vector of relative errors for all poses.</p>
+</dd>
+<dt>calc_rpe_error(error_vector, error_type=’rotation_angle_deg’)</dt><dd><p>Calculate an specific error from relatives errors.</p>
+</dd>
+<dt>get_statistics(rpe_vector)</dt><dd><p>Statistics of a vector.</p>
+</dd>
+</dl>
+</dd>
+<dt>EXAMPLES</dt><dd><p># calculate rpe errors vector
+rpe_vector = calculate_rpe_vector(gt_tst, gt_rot, pred_tst, pred_rot)
+rpe_error = calc_rpe_error(rpe_vector)</p>
+<p># calculate errors statistics
+statistics = get_statistics(rpe_error)</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="src.rpe_calc.calc_rpe_error">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">calc_rpe_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">error_vector</span></em>, <em class="sig-param"><span class="n">error_type</span><span class="o">=</span><span class="default_value">'rotation_angle_deg'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#calc_rpe_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.calc_rpe_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate an specific error from relatives errors.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>error_vector<span class="classifier">list</span></dt><dd><p>List of relative errors.</p>
+</dd>
+<dt>error_type<span class="classifier">str</span></dt><dd><p>Type of relative error to compute.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>error<span class="classifier">list</span></dt><dd><p>The error asked by user.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.calc_rpe_pair">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">calc_rpe_pair</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q_i</span></em>, <em class="sig-param"><span class="n">q_i_delta</span></em>, <em class="sig-param"><span class="n">p_i</span></em>, <em class="sig-param"><span class="n">p_i_delta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#calc_rpe_pair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.calc_rpe_pair" title="Permalink to this definition">¶</a></dt>
+<dd><p>The relative error between GT and Predict.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>q_i<span class="classifier">np.array</span></dt><dd><p>The pose at time i.</p>
+</dd>
+<dt>q_i_delta<span class="classifier">np.array</span></dt><dd><p>The pose at time i + delta.</p>
+</dd>
+<dt>p_i<span class="classifier">np.array</span></dt><dd><p>The predicted pose at time i.</p>
+</dd>
+<dt>p_i_delta<span class="classifier">np.array</span></dt><dd><p>The predicted pose at time i + delta.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>np.float32</dt><dd><p>The relative distance between two poses.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.calculate_rpe_vector">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">calculate_rpe_vector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gt_tst</span></em>, <em class="sig-param"><span class="n">gt_rot</span></em>, <em class="sig-param"><span class="n">pred_tst</span></em>, <em class="sig-param"><span class="n">pred_rot</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#calculate_rpe_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.calculate_rpe_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a vector of relative errors for all poses.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>gt_tst<span class="classifier">np.array</span></dt><dd><p>The (x,y,z) of the ground truth.</p>
+</dd>
+<dt>gt_rot<span class="classifier">np.array</span></dt><dd><p>The (theta_x, theta_y, theta_z) of the ground truth.</p>
+</dd>
+<dt>pred_tst<span class="classifier">np.array</span></dt><dd><p>The (x,y,z) of the predict pose.</p>
+</dd>
+<dt>pred_rot<span class="classifier">np.array</span></dt><dd><p>The (theta_x, theta_y, theta_z) of the predict pose.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>errors<span class="classifier">list</span></dt><dd><p>The list of relative errors.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.convert_pose_se3">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">convert_pose_se3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pose_tst</span></em>, <em class="sig-param"><span class="n">pose_rot</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#convert_pose_se3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.convert_pose_se3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a rotation matrix (or euler angles)
+plus a translation vector into a 4x4 pose
+representation.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>pose_tst<span class="classifier">np.array</span></dt><dd><p>The (x,y,z) of pose.</p>
+</dd>
+<dt>pose_rot<span class="classifier">np.array</span></dt><dd><p>The (theta_x, theta_y, theta_z) of pose.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>np.array (4x4)</dt><dd><p>The pose 4x4 matrix.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.get_statistics">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">get_statistics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rpe_vector</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#get_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.get_statistics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics of a vector.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>rpe_vector<span class="classifier">list</span></dt><dd><p>List of errors.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>dict</dt><dd><p>Dict with statistics of a list.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.relative_se3">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">relative_se3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pose_1</span></em>, <em class="sig-param"><span class="n">pose_2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#relative_se3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.relative_se3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relative pose between two poses (drift).</p>
+<blockquote>
+<div><dl class="simple">
+<dt>pose_1<span class="classifier">np.array</span></dt><dd><p>The first pose.</p>
+</dd>
+<dt>pose_2<span class="classifier">np.array</span></dt><dd><p>The second pose.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>np.float32</dt><dd><p>The relative transformation
+pose_1^{⁻1} * pose_2.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.se3_inverse">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">se3_inverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#se3_inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.se3_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>The inverse of a pose.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>pose<span class="classifier">np.array</span></dt><dd><p>The pose.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>np.float32</dt><dd><p>The inverted pose.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.rpe_calc.so3_log">
+<code class="sig-prename descclassname">src.rpe_calc.</code><code class="sig-name descname">so3_log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rot_matrix</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/rpe_calc.html#so3_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.rpe_calc.so3_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the rotation vector from
+rotation matrix.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>rot_matrix<span class="classifier">np.array</span></dt><dd><p>The rotation matrix.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>np.float32</dt><dd><p>The error angle.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.ate_calc">
+<span id="ate-functions"></span><h2>ATE Functions<a class="headerlink" href="#module-src.ate_calc" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>NAME</dt><dd><p>ate_calc</p>
+</dd>
+<dt>DESCRIPTION</dt><dd><p>Module that implements methods to calculate
+the absolute trajectory error between two trajectories.</p>
+</dd>
+<dt>METHODS</dt><dd><dl class="simple">
+<dt>compute_ate(gt_tst, pred_tst)</dt><dd><p>Calculate the absolute trajectory
+error between two poses. Based on LearnerLee
+- KITTI_odometry_evaluation_tool repository.</p>
+</dd>
+<dt>compute_ate_horn(gt_tst, pred_tst)</dt><dd><p>Calculate the absolute trajectory error
+between two poses. Based on Horn align
+method. Explained by <a class="reference external" href="https://vision.in.tum.de/">https://vision.in.tum.de/</a>.</p>
+</dd>
+<dt>ate_xyz(alignment_error)</dt><dd><p>Calculate the statistics
+for separate axis.</p>
+</dd>
+</dl>
+</dd>
+<dt>EXAMPLES</dt><dd><p># get translational attrs
+gt_tst = [v for v in gt_poses[:, 3:6]]
+pred_tst = [v for v in pred_poses[:, 3:]]</p>
+<p>alignment_error, trans_error = compute_ate_horn(gt_tst, pred_tst)
+statistics = ate_xyz(alignment_error)</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="src.ate_calc.ate_xyz">
+<code class="sig-prename descclassname">src.ate_calc.</code><code class="sig-name descname">ate_xyz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alignment_error</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ate_calc.html#ate_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ate_calc.ate_xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the statistics
+for separate axis.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>gt_tst<span class="classifier">list</span></dt><dd><p>List of ground truth poses.</p>
+</dd>
+<dt>pred_tst<span class="classifier">list</span></dt><dd><p>List of predict poses.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>alignment_error<span class="classifier">np.array (3xn)</span></dt><dd><p>A matrix of errors by axis.</p>
+</dd>
+<dt>trans_error<span class="classifier">list</span></dt><dd><p>The sum of error by row.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.ate_calc.compute_ate">
+<code class="sig-prename descclassname">src.ate_calc.</code><code class="sig-name descname">compute_ate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gt_tst</span></em>, <em class="sig-param"><span class="n">pred_tst</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ate_calc.html#compute_ate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ate_calc.compute_ate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the absolute trajectory
+error between two poses. Based on LearnerLee
+- KITTI_odometry_evaluation_tool repository.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>gt_tst<span class="classifier">list</span></dt><dd><p>List of ground truth poses.</p>
+</dd>
+<dt>pred_tst<span class="classifier">list</span></dt><dd><p>List of predict poses.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>alignment_error<span class="classifier">np.array (nx3)</span></dt><dd><p>A matrix of errors by axis.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.ate_calc.compute_ate_horn">
+<code class="sig-prename descclassname">src.ate_calc.</code><code class="sig-name descname">compute_ate_horn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gt_tst</span></em>, <em class="sig-param"><span class="n">pred_tst</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ate_calc.html#compute_ate_horn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.ate_calc.compute_ate_horn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the absolute trajectory error
+between two poses. Based on Horn align
+method. Explained by <a class="reference external" href="https://vision.in.tum.de/">https://vision.in.tum.de/</a>.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>gt_tst<span class="classifier">list</span></dt><dd><p>List of ground truth poses.</p>
+</dd>
+<dt>pred_tst<span class="classifier">list</span></dt><dd><p>List of predict poses.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>alignment_error<span class="classifier">np.array (3xn)</span></dt><dd><p>A matrix of errors by axis.</p>
+</dd>
+<dt>trans_error<span class="classifier">list</span></dt><dd><p>The sum of error by row.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">odometry-evaluation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Luiz Cartolano.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

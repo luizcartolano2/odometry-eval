@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>src.visualize &#8212; odometry-evaluation 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.visualize</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: UTF8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NAME</span>
+<span class="sd">        visualize</span>
+<span class="sd">    DESCRIPTION</span>
+<span class="sd">        Module that implements methods to plot ground_truth trajectories</span>
+<span class="sd">        and estimated for 6D poses.</span>
+<span class="sd">    METHODS</span>
+<span class="sd">        get_xy(pose)</span>
+<span class="sd">            Function that extracts (x,y) positions from</span>
+<span class="sd">            a list of 6D poses.</span>
+<span class="sd">        get_seq_start(pose)</span>
+<span class="sd">            Function that extracts the first (x,y)</span>
+<span class="sd">            point from a list of 6D poses.</span>
+<span class="sd">    EXAMPLES</span>
+<span class="sd">        gt = np.load(&#39;04.npy&#39;)</span>
+<span class="sd">        # create plot obj</span>
+<span class="sd">        plt.clf()</span>
+<span class="sd">        # get gt_poses</span>
+<span class="sd">        gt_x, gt_y = get_xy(gt)</span>
+<span class="sd">        # get sequence start</span>
+<span class="sd">        x_start, y_start = get_seq_start(gt)</span>
+<span class="sd">        # plot gt</span>
+<span class="sd">        plt.scatter(x_start, y_start, label=&#39;Sequence Start&#39;, color=&#39;black&#39;)</span>
+<span class="sd">        plt.plot(gt_x, gt_y, color=&#39;g&#39;, label=&#39;Ground Truth&#39;)</span>
+<span class="sd">        # make the adjust for compute just translation</span>
+<span class="sd">        # instead of absolute position</span>
+<span class="sd">        plt.gca().set_aspect(&#39;equal&#39;, adjustable=&#39;datalim&#39;)</span>
+<span class="sd">        # show plot</span>
+<span class="sd">        plt.legend()</span>
+<span class="sd">        plt.show()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="get_xy"><a class="viewcode-back" href="../../index.html#src.visualize.get_xy">[docs]</a><span class="k">def</span> <span class="nf">get_xy</span><span class="p">(</span><span class="n">pose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that extracts (x,y) positions from</span>
+<span class="sd">        a list of 6D poses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            pose : nd.array</span>
+<span class="sd">                List of 6D poses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            x_pose : list</span>
+<span class="sd">                List of x positions.</span>
+<span class="sd">            y_pose : list</span>
+<span class="sd">                List of y positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_pose</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pose</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]]</span>
+    <span class="n">y_pose</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pose</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">x_pose</span><span class="p">,</span> <span class="n">y_pose</span></div>
+
+
+<div class="viewcode-block" id="get_seq_start"><a class="viewcode-back" href="../../index.html#src.visualize.get_seq_start">[docs]</a><span class="k">def</span> <span class="nf">get_seq_start</span><span class="p">(</span><span class="n">pose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that extracts the first (x,y)</span>
+<span class="sd">        point from a list of 6D poses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            pose : nd.array</span>
+<span class="sd">                List of 6D poses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            x_start : float</span>
+<span class="sd">                Start x point.</span>
+<span class="sd">            y_start : float</span>
+<span class="sd">                Start y point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_start</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">y_start</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">x_start</span><span class="p">,</span> <span class="n">y_start</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">odometry-evaluation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Luiz Cartolano.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

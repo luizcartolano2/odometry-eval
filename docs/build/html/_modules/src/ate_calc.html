@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>src.ate_calc &#8212; odometry-evaluation 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.ate_calc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: UTF8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    NAME</span>
+<span class="sd">        ate_calc</span>
+
+<span class="sd">    DESCRIPTION</span>
+<span class="sd">        Module that implements methods to calculate</span>
+<span class="sd">        the absolute trajectory error between two trajectories.</span>
+
+<span class="sd">    METHODS</span>
+<span class="sd">        compute_ate(gt_tst, pred_tst)</span>
+<span class="sd">            Calculate the absolute trajectory</span>
+<span class="sd">            error between two poses. Based on LearnerLee</span>
+<span class="sd">            - KITTI_odometry_evaluation_tool repository.</span>
+
+<span class="sd">        compute_ate_horn(gt_tst, pred_tst)</span>
+<span class="sd">            Calculate the absolute trajectory error</span>
+<span class="sd">            between two poses. Based on Horn align</span>
+<span class="sd">            method. Explained by https://vision.in.tum.de/.</span>
+
+<span class="sd">        ate_xyz(alignment_error)</span>
+<span class="sd">            Calculate the statistics</span>
+<span class="sd">            for separate axis.</span>
+<span class="sd">    EXAMPLES</span>
+<span class="sd">        # get translational attrs</span>
+<span class="sd">        gt_tst = [v for v in gt_poses[:, 3:6]]</span>
+<span class="sd">        pred_tst = [v for v in pred_poses[:, 3:]]</span>
+
+<span class="sd">        alignment_error, trans_error = compute_ate_horn(gt_tst, pred_tst)</span>
+<span class="sd">        statistics = ate_xyz(alignment_error)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">src.rpe_calc</span> <span class="kn">import</span> <span class="n">get_statistics</span>
+
+
+<div class="viewcode-block" id="compute_ate"><a class="viewcode-back" href="../../index.html#src.ate_calc.compute_ate">[docs]</a><span class="k">def</span> <span class="nf">compute_ate</span><span class="p">(</span><span class="n">gt_tst</span><span class="p">,</span> <span class="n">pred_tst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the absolute trajectory</span>
+<span class="sd">        error between two poses. Based on LearnerLee</span>
+<span class="sd">        - KITTI_odometry_evaluation_tool repository.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            gt_tst : list</span>
+<span class="sd">                List of ground truth poses.</span>
+<span class="sd">            pred_tst : list</span>
+<span class="sd">                List of predict poses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            alignment_error : np.array (nx3)</span>
+<span class="sd">                A matrix of errors by axis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get offset between first two poses</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">gt_tst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pred_tst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">#  convert both list to numpy array</span>
+    <span class="n">gt_tst_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gt_tst</span><span class="p">)</span>
+    <span class="n">pred_tst_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pred_tst</span><span class="p">)</span>
+
+    <span class="n">pred_tst_arr</span> <span class="o">+=</span> <span class="n">offset</span>
+
+    <span class="c1"># scaling factor</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gt_tst_arr</span> <span class="o">*</span> <span class="n">pred_tst_arr</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pred_tst_arr</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">alignment_error</span> <span class="o">=</span> <span class="n">pred_tst_arr</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">-</span> <span class="n">pred_tst_arr</span>
+    <span class="c1"># rmse = np.sqrt(np.sum(alignment_error ** 2))/len(gt_tst)</span>
+
+    <span class="k">return</span> <span class="n">alignment_error</span></div>
+
+
+<div class="viewcode-block" id="compute_ate_horn"><a class="viewcode-back" href="../../index.html#src.ate_calc.compute_ate_horn">[docs]</a><span class="k">def</span> <span class="nf">compute_ate_horn</span><span class="p">(</span><span class="n">gt_tst</span><span class="p">,</span> <span class="n">pred_tst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the absolute trajectory error</span>
+<span class="sd">        between two poses. Based on Horn align</span>
+<span class="sd">        method. Explained by https://vision.in.tum.de/.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            gt_tst : list</span>
+<span class="sd">                List of ground truth poses.</span>
+<span class="sd">            pred_tst : list</span>
+<span class="sd">                List of predict poses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            alignment_error : np.array (3xn)</span>
+<span class="sd">                A matrix of errors by axis.</span>
+<span class="sd">            trans_error : list</span>
+<span class="sd">                The sum of error by row.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># make gt and pred columns</span>
+    <span class="n">gt_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_tst</span><span class="p">)))</span>
+    <span class="n">pred_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred_tst</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gt_tst</span><span class="p">):</span>
+        <span class="c1"># mounts gt matrix</span>
+        <span class="n">temp_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gt_tst</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">gt_mat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_col</span>
+        <span class="c1"># mounts pred matrix</span>
+        <span class="n">temp_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pred_tst</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pred_mat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_col</span>
+
+    <span class="n">gt_mat_zero_centered</span> <span class="o">=</span> <span class="n">gt_mat</span> <span class="o">-</span> <span class="n">gt_mat</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">pred_mat_zero_centered</span> <span class="o">=</span> <span class="n">pred_mat</span> <span class="o">-</span> <span class="n">pred_mat</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">w_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gt_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">w_mat</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">gt_mat_zero_centered</span><span class="p">[:,</span> <span class="n">column</span><span class="p">],</span> <span class="n">pred_mat_zero_centered</span><span class="p">[:,</span> <span class="n">column</span><span class="p">])</span>
+
+    <span class="n">u_mat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">v_h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">w_mat</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+    <span class="n">s_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">u_mat</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">v_h</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">s_mat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">rot</span> <span class="o">=</span> <span class="n">u_mat</span> <span class="o">*</span> <span class="n">s_mat</span> <span class="o">*</span> <span class="n">v_h</span>
+    <span class="n">trans</span> <span class="o">=</span> <span class="n">pred_mat</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">rot</span> <span class="o">*</span> <span class="n">gt_mat</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">model_aligned</span> <span class="o">=</span> <span class="n">rot</span> <span class="o">*</span> <span class="n">gt_mat</span> <span class="o">+</span> <span class="n">trans</span>
+    <span class="n">alignment_error</span> <span class="o">=</span> <span class="n">model_aligned</span> <span class="o">-</span> <span class="n">pred_mat</span>
+
+    <span class="n">trans_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">alignment_error</span><span class="p">,</span> <span class="n">alignment_error</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">alignment_error</span><span class="p">,</span> <span class="n">trans_error</span></div>
+
+
+<div class="viewcode-block" id="ate_xyz"><a class="viewcode-back" href="../../index.html#src.ate_calc.ate_xyz">[docs]</a><span class="k">def</span> <span class="nf">ate_xyz</span><span class="p">(</span><span class="n">alignment_error</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the statistics</span>
+<span class="sd">        for separate axis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            gt_tst : list</span>
+<span class="sd">                List of ground truth poses.</span>
+<span class="sd">            pred_tst : list</span>
+<span class="sd">                List of predict poses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            alignment_error : np.array (3xn)</span>
+<span class="sd">                A matrix of errors by axis.</span>
+<span class="sd">            trans_error : list</span>
+<span class="sd">                The sum of error by row.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">alignment_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Alignment vector must have 3 rows.&quot;</span>
+
+    <span class="n">x_error</span><span class="p">,</span> <span class="n">y_error</span><span class="p">,</span> <span class="n">z_error</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">alignment_error</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="c1"># get temp row</span>
+        <span class="n">temp_row</span> <span class="o">=</span> <span class="n">alignment_error</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span>
+
+        <span class="c1"># append individual errors</span>
+        <span class="n">x_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="n">y_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="n">z_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+    <span class="n">response_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;x_ate&#39;</span><span class="p">:</span> <span class="n">get_statistics</span><span class="p">(</span><span class="n">x_error</span><span class="p">),</span>
+        <span class="s1">&#39;y_ate&#39;</span><span class="p">:</span> <span class="n">get_statistics</span><span class="p">(</span><span class="n">y_error</span><span class="p">),</span>
+        <span class="s1">&#39;z_ate&#39;</span><span class="p">:</span> <span class="n">get_statistics</span><span class="p">(</span><span class="n">z_error</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">response_dict</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">odometry-evaluation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Luiz Cartolano.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
