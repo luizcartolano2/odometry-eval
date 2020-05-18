@@ -17,6 +17,7 @@ import argparse
 import matplotlib.pyplot as plt
 from src.visualize import get_xy, get_seq_start
 from src.rpe_calc import calculate_rpe_vector, get_statistics, calc_rpe_error
+from src.ate_calc import compute_ate_2 as compute_ate
 
 
 def create_argparse():
@@ -130,7 +131,12 @@ if __name__ == '__main__':
         file_to_save = pathlib.Path(pred_file).stem
         plt.savefig(f'{file_to_save}.png')
     elif ate_opt is not None:
-        raise NotImplementedError
+        # get translational attrs
+        gt_tst = [v for v in gt_poses[:, 3:6]]
+        pred_tst = [v for v in pred_poses[:, 3:]]
+
+        compute_ate(gt_tst, pred_tst)
+
     elif rpe_opt is not None:
         # get translational attrs
         gt_tst = [v for v in gt_poses[:, 3:6]]
