@@ -1,4 +1,4 @@
-# Github Template
+# Odometry Evaluation
 
 This is an API that implements a system to evaluate odometry trajectories.
 
