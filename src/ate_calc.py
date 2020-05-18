@@ -8,13 +8,15 @@
         the absolute trajectory error between two trajectories.
 
     METHODS
-        TODO: add
-
+        compute_ate(gt_tst, pred_tst)
+        compute_ate_horn(gt_tst, pred_tst)
+        ate_xyz(alignment_error)
     EXAMPLES
         TODO: add
 """
 
 import numpy as np
+from .rpe_calc import get_statistics
 
 
 def compute_ate(gt_tst, pred_tst):
@@ -35,7 +37,7 @@ def compute_ate(gt_tst, pred_tst):
     return alignment_error
 
 
-def compute_ate_2(gt_tst, pred_tst):
+def compute_ate_horn(gt_tst, pred_tst):
     # make gt and pred columns
     gt_mat = np.ones(shape=(3, len(gt_tst)))
     pred_mat = np.ones(shape=(3, len(pred_tst)))
@@ -70,3 +72,25 @@ def compute_ate_2(gt_tst, pred_tst):
     trans_error = np.sqrt(np.sum(np.multiply(alignment_error,alignment_error),0)).A[0]
 
     return alignment_error, trans_error
+
+
+def ate_xyz(alignment_error):
+    assert alignment_error.shape[0] == 3, f"Alignment vector must have 3 rows."
+
+    x_error, y_error, z_error = [], [], []
+    for column in range(alignment_error.shape[1]):
+        # get temp row
+        temp_row = alignment_error[:, column]
+
+        # append individual errors
+        x_error.append(temp_row[0].item())
+        y_error.append(temp_row[1].item())
+        z_error.append(temp_row[2].item())
+
+    response_dict = {
+        'x_ate': get_statistics(x_error),
+        'y_ate': get_statistics(y_error),
+        'z_ate': get_statistics(z_error),
+    }
+
+    return response_dict

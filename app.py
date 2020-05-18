@@ -17,7 +17,7 @@ import argparse
 import matplotlib.pyplot as plt
 from src.visualize import get_xy, get_seq_start
 from src.rpe_calc import calculate_rpe_vector, get_statistics, calc_rpe_error
-from src.ate_calc import compute_ate_2 as compute_ate
+from src.ate_calc import ate_xyz, compute_ate_horn
 
 
 def create_argparse():
@@ -129,15 +129,25 @@ if __name__ == '__main__':
         plt.legend()
 
         file_to_save = pathlib.Path(pred_file).stem
-        plt.savefig(f'{file_to_save}.png')
-    elif ate_opt is not None:
+        plt.savefig(f'{file_to_save}_plot.png')
+
+    if ate_opt is not None:
         # get translational attrs
         gt_tst = [v for v in gt_poses[:, 3:6]]
         pred_tst = [v for v in pred_poses[:, 3:]]
 
-        compute_ate(gt_tst, pred_tst)
+        alignment_error, trans_error = compute_ate_horn(gt_tst, pred_tst)
+        statistics = ate_xyz(alignment_error)
 
-    elif rpe_opt is not None:
+        # write response to a .txt file
+        file_to_save = pathlib.Path(pred_file).stem
+        with open(f'{file_to_save}_ate.txt', 'w') as f:
+            for k, v in statistics.items():
+                f.write(f'{k}: \n\n')
+                for key, value in v.items():
+                    f.write(f'\t {key} >>> {value} \n\n')
+
+    if rpe_opt is not None:
         # get translational attrs
         gt_tst = [v for v in gt_poses[:, 3:6]]
         pred_tst = [v for v in pred_poses[:, 3:]]
@@ -148,15 +158,21 @@ if __name__ == '__main__':
 
         # calculate rpe errors vector
         rpe_vector = calculate_rpe_vector(gt_tst, gt_rot, pred_tst, pred_rot)
-        rpe_error = calc_rpe_error(rpe_vector)
+        rpe_error_tst = calc_rpe_error(rpe_vector, error_type='translation_part')
+        rpe_error_rot = calc_rpe_error(rpe_vector, error_type='rotation_part')
 
         # calculate errors statistics
-        statistics = get_statistics(rpe_error)
+        statistics_tst = get_statistics(rpe_error_tst)
+        statistics_rot = get_statistics(rpe_error_rot)
+        statistics = {
+            'Translation': statistics_tst,
+            'Rotation': statistics_rot,
+        }
 
         # write response to a .txt file
         file_to_save = pathlib.Path(pred_file).stem
-        with open(f'{file_to_save}.txt', 'w') as f:
+        with open(f'{file_to_save}_rpe.txt', 'w') as f:
             for k, v in statistics.items():
-                f.write(f'{k} >>> {v} \n\n')
-    else:
-        raise NotImplementedError
+                f.write(f'{k}: \n\n')
+                for key, value in v.items():
+                    f.write(f'\t {key} >>> {value} \n\n')
