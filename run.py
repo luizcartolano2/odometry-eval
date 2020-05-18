@@ -21,7 +21,7 @@ from src.ate_calc import ate_xyz, compute_ate_horn
 
 
 def create_argparse():
-    parser = argparse.ArgumentParser(prog='app',
+    parser = argparse.ArgumentParser(prog='run',
                                      usage='%(prog)s [options] path',
                                      description='Run odometry metrics.')
     parser.add_argument('file_gt',
@@ -102,7 +102,6 @@ if __name__ == '__main__':
     pred_poses = read_file(pred_file)
 
     # now act according to the opt, if
-    # none is given perform all metrics
     if visualize_opt is not None:
         # create plot obj
         plt.clf()
