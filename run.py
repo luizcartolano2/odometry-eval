@@ -23,6 +23,7 @@ import pathlib
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D 
 from src.visualize import get_xy, get_seq_start
 from src.rpe_calc import calculate_rpe_vector, get_statistics, calc_rpe_error
 from src.ate_calc import ate_xyz, compute_ate_horn
@@ -47,6 +48,13 @@ def create_argparse():
     parser.add_argument('-v',
                         '--visualize',
                         help='visualize',
+                        nargs='?',
+                        const=1,
+                        type=int)
+
+    parser.add_argument('-3dv',
+                        '--visualize3d',
+                        help='3D_visualize',
                         nargs='?',
                         const=1,
                         type=int)
@@ -93,6 +101,7 @@ if __name__ == '__main__':
     gt_path = args.file_gt
     pred_file = args.file_pred
     visualize_opt = args.visualize
+    visualize_3d_opt = args.visualize3d
     ate_opt = args.ate
     rpe_opt = args.rpe
 
@@ -137,6 +146,32 @@ if __name__ == '__main__':
 
         file_to_save = pathlib.Path(pred_file).stem
         plt.savefig(f'{file_to_save}_plot.png')
+
+    if visualize_3d_opt is not None:
+        # get gt_poses
+        gt_x = [v for v in gt_poses[:, 3]]
+        gt_y = [v for v in gt_poses[:, 4]]
+        gt_z = [v for v in gt_poses[:, 5]]
+
+        # get predict x,y
+        pred_x = [v for v in pred_poses[:, 0]]
+        pred_y = [v for v in pred_poses[:, 1]]
+        pred_z = [v for v in pred_poses[:, 2]]
+
+        fig = plt.figure()
+        ax = plt.axes(projection="3d")
+
+        ax.plot3D(gt_x, gt_y, gt_z, 'black', label='GT')
+        ax.plot3D(pred_x, pred_y, pred_z, 'blue', label='Pred')
+
+        # # instead of absolute position
+        # Not implemented for 3D charts
+        # plt.gca().set_aspect('equal', adjustable='datalim')
+        plt.legend()
+        # plt.show()
+
+        file_to_save = pathlib.Path(pred_file).stem
+        plt.savefig(f'{file_to_save}_3d_plot.png')
 
     if ate_opt is not None:
         # get translational attrs
